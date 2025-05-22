@@ -319,7 +319,6 @@ export default function ProfileScreen() {
       ...prev,
       [field]: value,
     }));
-    // Limpa o erro do campo quando ele é editado
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,

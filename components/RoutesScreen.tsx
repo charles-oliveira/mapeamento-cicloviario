@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -79,28 +79,34 @@ export const RoutesScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
-      {routes.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Ionicons name="map-outline" size={64} color="#ccc" />
-          <Text style={styles.emptyText}>Nenhuma rota salva</Text>
-          <Text style={styles.emptySubtext}>
-            Adicione rotas no mapa para vê-las aqui
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={routes}
-          renderItem={renderRouteItem}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.listContainer}
-        />
-      )}
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        {routes.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Ionicons name="map-outline" size={64} color="#ccc" />
+            <Text style={styles.emptyText}>Nenhuma rota salva</Text>
+            <Text style={styles.emptySubtext}>
+              Adicione rotas no mapa para vê-las aqui
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            data={routes}
+            renderItem={renderRouteItem}
+            keyExtractor={item => item.id}
+            contentContainerStyle={styles.listContainer}
+          />
+        )}
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',

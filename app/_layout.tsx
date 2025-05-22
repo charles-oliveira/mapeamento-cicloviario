@@ -1,26 +1,40 @@
 import { Stack } from 'expo-router';
-import { usePathname } from 'expo-router';
-import { Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { StatusBar } from 'expo-status-bar';
+import { View } from 'react-native';
+import { ThemeProvider } from '../contexts/ThemeContext';
 
 export default function Layout() {
-  const pathname = usePathname();
-  const showTabs = pathname !== '/';
-
   return (
-    <Stack>
-      <Stack.Screen
-        name="index"
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="(tabs)"
-        options={{
-          headerShown: false,
-        }}
-      />
-    </Stack>
+    <ThemeProvider>
+      <View style={{ flex: 1 }}>
+        <StatusBar style="light" backgroundColor="#4CAF50" />
+        <Stack>
+          <Stack.Screen
+            name="index"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="login"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="register"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="(tabs)"
+            options={{
+              headerShown: false,
+            }}
+          />
+        </Stack>
+      </View>
+    </ThemeProvider>
   );
 }

@@ -69,7 +69,6 @@ export default function ReportsScreen() {
       }
       if (savedRoutes) {
         const parsedRoutes = JSON.parse(savedRoutes);
-        // Garante que todas as rotas tenham a propriedade date
         const validRoutes = parsedRoutes.map((route: any) => ({
           ...route,
           date: route.date || new Date().toISOString(),
@@ -220,7 +219,6 @@ export default function ReportsScreen() {
     if (activeTab === 'problems') {
       let data = [...markers];
       
-      // Aplicar filtro de busca
       if (searchText) {
         data = data.filter(item => 
           item.description.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -228,12 +226,10 @@ export default function ReportsScreen() {
         );
       }
 
-      // Aplicar filtro de tipos
       if (selectedTypes.length > 0) {
         data = data.filter(item => selectedTypes.includes(item.problemType));
       }
 
-      // Aplicar ordenação
       data.sort((a, b) => {
         if (sortBy === 'date') {
           return sortOrder === 'asc' 
@@ -251,7 +247,6 @@ export default function ReportsScreen() {
     } else {
       let data = [...routes];
       
-      // Aplicar filtro de busca
       if (searchText) {
         data = data.filter(item => 
           item.name.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -259,7 +254,6 @@ export default function ReportsScreen() {
         );
       }
 
-      // Aplicar ordenação
       data.sort((a, b) => {
         if (sortBy === 'date') {
           return sortOrder === 'asc' 
@@ -270,7 +264,7 @@ export default function ReportsScreen() {
             ? a.name.localeCompare(b.name)
             : b.name.localeCompare(a.name);
         }
-        return 0; // Caso padrão para garantir que sempre retorne um número
+        return 0;
       });
 
       return data;

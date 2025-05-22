@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert, Image, ScrollView, ActivityIndicator, Share, Switch } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert, Image, ScrollView, ActivityIndicator, Share, Switch, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const STORAGE_KEYS = {
   USER_PROFILE: '@user_profile',
@@ -42,6 +43,8 @@ interface UserStats {
 }
 
 export default function ProfileScreen() {
+  const { colors, isDarkMode, toggleTheme } = useTheme();
+  const [languageDropdownVisible, setLanguageDropdownVisible] = useState(false);
   const [profile, setProfile] = useState<UserProfile>({
     name: '',
     email: '',
@@ -84,7 +87,15 @@ export default function ProfileScreen() {
       ]);
 
       if (savedProfile) setProfile(JSON.parse(savedProfile));
-      if (savedPreferences) setPreferences(JSON.parse(savedPreferences));
+      if (savedPreferences) {
+        setPreferences(JSON.parse(savedPreferences));
+      } else {
+        setPreferences({
+          darkMode: false,
+          notifications: true,
+          language: 'pt-BR',
+        });
+      }
       if (savedStats) setStats(JSON.parse(savedStats));
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
@@ -146,26 +157,28 @@ export default function ProfileScreen() {
         <Text style={styles.title}>Meu Perfil</Text>
       </View>
 
-      <View style={styles.form}>
+      <View style={[styles.form, { backgroundColor: colors.surface }]}>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Nome</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Nome</Text>
           <TextInput
-            style={[styles.input, errors.name && styles.inputError]}
+            style={[styles.input, { backgroundColor: isDarkMode ? '#2a2a2a' : '#fafafa', color: colors.text }, errors.name && styles.inputError]}
             value={profile.name}
             onChangeText={(value) => handleInputChange('name', value)}
             placeholder="Seu nome"
+            placeholderTextColor={colors.textSecondary}
             editable={isEditing}
           />
           {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Email</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Email</Text>
           <TextInput
-            style={[styles.input, errors.email && styles.inputError]}
+            style={[styles.input, { backgroundColor: isDarkMode ? '#2a2a2a' : '#fafafa', color: colors.text }, errors.email && styles.inputError]}
             value={profile.email}
             onChangeText={(value) => handleInputChange('email', value)}
             placeholder="seu@email.com"
+            placeholderTextColor={colors.textSecondary}
             keyboardType="email-address"
             editable={isEditing}
           />
@@ -173,12 +186,13 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Telefone</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Telefone</Text>
           <TextInput
-            style={[styles.input, errors.phone && styles.inputError]}
+            style={[styles.input, { backgroundColor: isDarkMode ? '#2a2a2a' : '#fafafa', color: colors.text }, errors.phone && styles.inputError]}
             value={profile.phone}
             onChangeText={(value) => handleInputChange('phone', value)}
             placeholder="(00) 00000-0000"
+            placeholderTextColor={colors.textSecondary}
             keyboardType="phone-pad"
             editable={isEditing}
           />
@@ -186,23 +200,25 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Endereço</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Endereço</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: isDarkMode ? '#2a2a2a' : '#fafafa', color: colors.text }]}
             value={profile.address}
             onChangeText={(value) => handleInputChange('address', value)}
             placeholder="Seu endereço"
+            placeholderTextColor={colors.textSecondary}
             editable={isEditing}
           />
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Biografia</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Biografia</Text>
           <TextInput
-            style={[styles.input, styles.bioInput]}
+            style={[styles.input, styles.bioInput, { backgroundColor: isDarkMode ? '#2a2a2a' : '#fafafa', color: colors.text }]}
             value={profile.bio}
             onChangeText={(value) => handleInputChange('bio', value)}
             placeholder="Conte um pouco sobre você"
+            placeholderTextColor={colors.textSecondary}
             multiline
             numberOfLines={4}
             editable={isEditing}
@@ -210,30 +226,32 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.socialLinksContainer}>
-          <Text style={styles.sectionTitle}>Redes Sociais</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Redes Sociais</Text>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Instagram</Text>
+            <Text style={[styles.label, { color: colors.text }]}>Instagram</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: isDarkMode ? '#2a2a2a' : '#fafafa', color: colors.text }]}
               value={profile.socialLinks?.instagram}
               onChangeText={(value) => setProfile(prev => ({
                 ...prev,
                 socialLinks: { ...prev.socialLinks, instagram: value }
               }))}
               placeholder="@seu_usuario"
+              placeholderTextColor={colors.textSecondary}
               editable={isEditing}
             />
           </View>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Strava</Text>
+            <Text style={[styles.label, { color: colors.text }]}>Strava</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: isDarkMode ? '#2a2a2a' : '#fafafa', color: colors.text }]}
               value={profile.socialLinks?.strava}
               onChangeText={(value) => setProfile(prev => ({
                 ...prev,
                 socialLinks: { ...prev.socialLinks, strava: value }
               }))}
               placeholder="Seu perfil no Strava"
+              placeholderTextColor={colors.textSecondary}
               editable={isEditing}
             />
           </View>
@@ -273,23 +291,23 @@ export default function ProfileScreen() {
 
   const renderPreferencesTab = () => (
     <View style={styles.preferencesContainer}>
-      <View style={styles.preferenceItem}>
+      <View style={[styles.preferenceItem, { backgroundColor: colors.surface }]}>
         <View style={styles.preferenceInfo}>
-          <Ionicons name="moon-outline" size={24} color="#666" />
-          <Text style={styles.preferenceLabel}>Modo Escuro</Text>
+          <Ionicons name="moon-outline" size={24} color={colors.text} />
+          <Text style={[styles.preferenceLabel, { color: colors.text }]}>Modo Escuro</Text>
         </View>
         <Switch
-          value={preferences.darkMode}
-          onValueChange={(value) => setPreferences(prev => ({ ...prev, darkMode: value }))}
+          value={isDarkMode}
+          onValueChange={toggleTheme}
           trackColor={{ false: '#767577', true: '#81b0ff' }}
-          thumbColor={preferences.darkMode ? '#4CAF50' : '#f4f3f4'}
+          thumbColor={isDarkMode ? '#4CAF50' : '#f4f3f4'}
         />
       </View>
 
-      <View style={styles.preferenceItem}>
+      <View style={[styles.preferenceItem, { backgroundColor: colors.surface }]}>
         <View style={styles.preferenceInfo}>
-          <Ionicons name="notifications-outline" size={24} color="#666" />
-          <Text style={styles.preferenceLabel}>Notificações</Text>
+          <Ionicons name="notifications-outline" size={24} color={colors.text} />
+          <Text style={[styles.preferenceLabel, { color: colors.text }]}>Notificações</Text>
         </View>
         <Switch
           value={preferences.notifications}
@@ -299,17 +317,60 @@ export default function ProfileScreen() {
         />
       </View>
 
-      <View style={styles.preferenceItem}>
-        <View style={styles.preferenceInfo}>
-          <Ionicons name="language-outline" size={24} color="#666" />
-          <Text style={styles.preferenceLabel}>Idioma</Text>
+      <View style={[styles.preferenceItem, { backgroundColor: colors.surface, flexDirection: 'column', alignItems: 'stretch' }]}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <View style={styles.preferenceInfo}>
+            <Ionicons name="language-outline" size={24} color={colors.text} />
+            <Text style={[styles.preferenceLabel, { color: colors.text }]}>Idioma</Text>
+          </View>
+          <TouchableOpacity 
+            style={[styles.languageButton, { backgroundColor: isDarkMode ? '#2a2a2a' : '#f5f5f5' }]}
+            onPress={() => setLanguageDropdownVisible(!languageDropdownVisible)}
+          >
+            <Text style={[styles.languageText, { color: colors.textSecondary }]}>
+              {preferences.language === 'pt-BR' ? 'Português' : 'English'}
+            </Text>
+            <Ionicons 
+              name={languageDropdownVisible ? "chevron-up" : "chevron-down"} 
+              size={20} 
+              color={colors.textSecondary} 
+            />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.languageButton}>
-          <Text style={styles.languageText}>
-            {preferences.language === 'pt-BR' ? 'Português' : 'English'}
-          </Text>
-          <Ionicons name="chevron-down" size={20} color="#666" />
-        </TouchableOpacity>
+        
+        {languageDropdownVisible && (
+          <View style={[styles.languageDropdown, { backgroundColor: isDarkMode ? '#2a2a2a' : '#f5f5f5' }]}>
+            <TouchableOpacity
+              style={[styles.languageDropdownItem, preferences.language === 'pt-BR' && { backgroundColor: colors.primary + '20' }]}
+              onPress={() => {
+                setPreferences(prev => ({ ...prev, language: 'pt-BR' }));
+                setLanguageDropdownVisible(false);
+              }}
+            >
+              <Text style={[styles.languageDropdownText, { color: colors.text }]}>
+                Português (Brasil)
+              </Text>
+              {preferences.language === 'pt-BR' && (
+                <Ionicons name="checkmark" size={20} color={colors.primary} />
+              )}
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={[styles.languageDropdownItem, preferences.language === 'en' && { backgroundColor: colors.primary + '20' }]}
+              onPress={() => {
+                setPreferences(prev => ({ ...prev, language: 'en' }));
+                setLanguageDropdownVisible(false);
+              }}
+            >
+              <Text style={[styles.languageDropdownText, { color: colors.text }]}>
+                English
+              </Text>
+              {preferences.language === 'en' && (
+                <Ionicons name="checkmark" size={20} color={colors.primary} />
+              )}
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -359,98 +420,102 @@ export default function ProfileScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.tabBar}>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'profile' && styles.activeTab]}
-          onPress={() => setActiveTab('profile')}
-        >
-          <Ionicons
-            name="person-outline"
-            size={24}
-            color={activeTab === 'profile' ? '#4CAF50' : '#666'}
-          />
-          <Text style={[styles.tabText, activeTab === 'profile' && styles.activeTabText]}>
-            Perfil
-          </Text>
-        </TouchableOpacity>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.tabBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'profile' && styles.activeTab]}
+            onPress={() => setActiveTab('profile')}
+          >
+            <Ionicons
+              name="person-outline"
+              size={24}
+              color={activeTab === 'profile' ? '#4CAF50' : '#666'}
+            />
+            <Text style={[styles.tabText, activeTab === 'profile' && styles.activeTabText]}>
+              Perfil
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'stats' && styles.activeTab]}
-          onPress={() => setActiveTab('stats')}
-        >
-          <Ionicons
-            name="stats-chart-outline"
-            size={24}
-            color={activeTab === 'stats' ? '#4CAF50' : '#666'}
-          />
-          <Text style={[styles.tabText, activeTab === 'stats' && styles.activeTabText]}>
-            Estatísticas
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'stats' && styles.activeTab]}
+            onPress={() => setActiveTab('stats')}
+          >
+            <Ionicons
+              name="stats-chart-outline"
+              size={24}
+              color={activeTab === 'stats' ? '#4CAF50' : '#666'}
+            />
+            <Text style={[styles.tabText, activeTab === 'stats' && styles.activeTabText]}>
+              Estatísticas
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'preferences' && styles.activeTab]}
-          onPress={() => setActiveTab('preferences')}
-        >
-          <Ionicons
-            name="settings-outline"
-            size={24}
-            color={activeTab === 'preferences' ? '#4CAF50' : '#666'}
-          />
-          <Text style={[styles.tabText, activeTab === 'preferences' && styles.activeTabText]}>
-            Preferências
-          </Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'preferences' && styles.activeTab]}
+            onPress={() => setActiveTab('preferences')}
+          >
+            <Ionicons
+              name="settings-outline"
+              size={24}
+              color={activeTab === 'preferences' ? '#4CAF50' : '#666'}
+            />
+            <Text style={[styles.tabText, activeTab === 'preferences' && styles.activeTabText]}>
+              Preferências
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      <ScrollView style={styles.content}>
-        {activeTab === 'profile' && renderProfileTab()}
-        {activeTab === 'stats' && renderStatsTab()}
-        {activeTab === 'preferences' && renderPreferencesTab()}
-      </ScrollView>
+        <ScrollView style={styles.content}>
+          {activeTab === 'profile' && renderProfileTab()}
+          {activeTab === 'stats' && renderStatsTab()}
+          {activeTab === 'preferences' && renderPreferencesTab()}
+        </ScrollView>
 
-      <View style={styles.buttonContainer}>
-        {isEditing ? (
-          <>
-            <TouchableOpacity
-              style={[styles.button, styles.cancelButton]}
-              onPress={() => {
-                setIsEditing(false);
-                loadAllData();
-              }}
-            >
-              <Text style={styles.buttonText}>Cancelar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, styles.saveButton]}
-              onPress={saveAllData}
-            >
-              <Text style={styles.buttonText}>Salvar</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <TouchableOpacity
-              style={[styles.button, styles.shareButton]}
-              onPress={shareProfile}
-            >
-              <Text style={styles.buttonText}>Compartilhar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, styles.editButton]}
-              onPress={() => setIsEditing(true)}
-            >
-              <Text style={styles.buttonText}>Editar</Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
+        <View style={styles.buttonContainer}>
+          {isEditing ? (
+            <>
+              <TouchableOpacity
+                style={[styles.button, styles.cancelButton]}
+                onPress={() => {
+                  setIsEditing(false);
+                  loadAllData();
+                }}
+              >
+                <Text style={styles.buttonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, styles.saveButton]}
+                onPress={saveAllData}
+              >
+                <Text style={styles.buttonText}>Salvar</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <TouchableOpacity
+                style={[styles.button, styles.shareButton]}
+                onPress={shareProfile}
+              >
+                <Text style={styles.buttonText}>Compartilhar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, styles.editButton]}
+                onPress={() => setIsEditing(true)}
+              >
+                <Text style={styles.buttonText}>Editar</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
@@ -516,7 +581,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: '#fafafa',
   },
   inputError: {
     borderColor: '#f44336',
@@ -682,5 +746,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 15,
+  },
+  languageDropdown: {
+    marginTop: 10,
+    borderRadius: 8,
+    padding: 5,
+  },
+  languageDropdownItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 6,
+  },
+  languageDropdownText: {
+    fontSize: 14,
   },
 }); 

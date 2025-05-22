@@ -4,6 +4,7 @@ import MapView, { Marker, Polyline, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useTheme } from '../contexts/ThemeContext';
 
 export const STORAGE_KEYS = {
   MARKERS: '@markers',
@@ -30,6 +31,7 @@ interface RouteData {
 }
 
 export const MapScreen = () => {
+  const { colors, isDarkMode } = useTheme();
   const [region, setRegion] = useState<Region | null>(null);
   const [markers, setMarkers] = useState<MarkerData[]>([]);
   const [routes, setRoutes] = useState<RouteData[]>([]);
@@ -95,7 +97,6 @@ export const MapScreen = () => {
       const newCoordinates = [...currentRoute.coordinates, e.nativeEvent.coordinate];
       setCurrentRoute({ coordinates: newCoordinates });
       
-      // Se o usuário tocar no último ponto, finaliza a rota
       if (newCoordinates.length > 1) {
         const lastPoint = newCoordinates[newCoordinates.length - 1];
         const secondLastPoint = newCoordinates[newCoordinates.length - 2];
@@ -104,7 +105,7 @@ export const MapScreen = () => {
           Math.pow(lastPoint.longitude - secondLastPoint.longitude, 2)
         );
         
-        if (distance < 0.0001) { // Se o ponto estiver muito próximo do último
+        if (distance < 0.0001) {
           finishDrawingRoute();
         }
       }
@@ -307,6 +308,7 @@ export const MapScreen = () => {
         <TouchableOpacity
           style={[
             styles.controlButton,
+            { backgroundColor: isDarkMode ? '#2a2a2a' : 'white' },
             selectedTool === 'marker' && styles.activeControlButton
           ]}
           onPress={() => setSelectedTool('marker')}
@@ -314,19 +316,21 @@ export const MapScreen = () => {
           <Ionicons 
             name="pin-outline" 
             size={24} 
-            color={selectedTool === 'marker' ? 'white' : '#333'} 
+            color={selectedTool === 'marker' ? 'white' : (isDarkMode ? '#fff' : '#333')} 
           />
           <Text style={[
             styles.controlButtonText,
+            { color: isDarkMode && selectedTool !== 'marker' ? '#fff' : undefined },
             selectedTool === 'marker' && styles.activeControlButtonText
           ]}>
-            Marcador
+            Marcar
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[
             styles.controlButton,
+            { backgroundColor: isDarkMode ? '#2a2a2a' : 'white' },
             selectedTool === 'route' && styles.activeControlButton
           ]}
           onPress={startDrawingRoute}
@@ -334,10 +338,11 @@ export const MapScreen = () => {
           <Ionicons 
             name="create-outline" 
             size={24} 
-            color={selectedTool === 'route' ? 'white' : '#333'} 
+            color={selectedTool === 'route' ? 'white' : (isDarkMode ? '#fff' : '#333')} 
           />
           <Text style={[
             styles.controlButtonText,
+            { color: isDarkMode && selectedTool !== 'route' ? '#fff' : undefined },
             selectedTool === 'route' && styles.activeControlButtonText
           ]}>
             Rota
@@ -355,22 +360,28 @@ export const MapScreen = () => {
               color="white" 
             />
             <Text style={[styles.controlButtonText, { color: 'white' }]}>
-              Finalizar
+              Salvar
             </Text>
           </TouchableOpacity>
         )}
 
         <TouchableOpacity
-          style={styles.controlButton}
+          style={[
+            styles.controlButton,
+            { backgroundColor: isDarkMode ? '#2a2a2a' : 'white' }
+          ]}
           onPress={handleLocationPress}
         >
           <Ionicons 
             name="locate-outline" 
             size={24} 
-            color="#333" 
+            color={isDarkMode ? '#fff' : '#333'} 
           />
-          <Text style={styles.controlButtonText}>
-            Localização
+          <Text style={[
+            styles.controlButtonText,
+            { color: isDarkMode ? '#fff' : undefined }
+          ]}>
+            Local
           </Text>
         </TouchableOpacity>
       </View>
@@ -382,15 +393,16 @@ export const MapScreen = () => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Reportar Problema</Text>
+          <View style={[styles.modalView, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Reportar Problema</Text>
             
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Tipo de Problema</Text>
+              <Text style={[styles.label, { color: colors.text }]}>Tipo de Problema</Text>
               <View style={styles.problemTypeButtons}>
                 <TouchableOpacity
                   style={[
                     styles.problemTypeButton,
+                    { backgroundColor: isDarkMode ? '#2a2a2a' : '#f0f0f0' },
                     problemType === 'buraco' && styles.activeProblemTypeButton
                   ]}
                   onPress={() => setProblemType('buraco')}
@@ -398,11 +410,11 @@ export const MapScreen = () => {
                   <Ionicons 
                     name="alert-circle-outline" 
                     size={20} 
-                    color={problemType === 'buraco' ? 'white' : '#333'} 
+                    color={problemType === 'buraco' ? 'white' : (isDarkMode ? '#fff' : '#333')} 
                   />
                   <Text style={[
                     styles.problemTypeButtonText,
-                    problemType === 'buraco' && styles.activeProblemTypeButtonText
+                    { color: problemType === 'buraco' ? 'white' : (isDarkMode ? '#fff' : '#333') }
                   ]}>
                     Buraco
                   </Text>
@@ -411,6 +423,7 @@ export const MapScreen = () => {
                 <TouchableOpacity
                   style={[
                     styles.problemTypeButton,
+                    { backgroundColor: isDarkMode ? '#2a2a2a' : '#f0f0f0' },
                     problemType === 'acidente' && styles.activeProblemTypeButton
                   ]}
                   onPress={() => setProblemType('acidente')}
@@ -418,11 +431,11 @@ export const MapScreen = () => {
                   <Ionicons 
                     name="warning-outline" 
                     size={20} 
-                    color={problemType === 'acidente' ? 'white' : '#333'} 
+                    color={problemType === 'acidente' ? 'white' : (isDarkMode ? '#fff' : '#333')} 
                   />
                   <Text style={[
                     styles.problemTypeButtonText,
-                    problemType === 'acidente' && styles.activeProblemTypeButtonText
+                    { color: problemType === 'acidente' ? 'white' : (isDarkMode ? '#fff' : '#333') }
                   ]}>
                     Acidente
                   </Text>
@@ -431,6 +444,7 @@ export const MapScreen = () => {
                 <TouchableOpacity
                   style={[
                     styles.problemTypeButton,
+                    { backgroundColor: isDarkMode ? '#2a2a2a' : '#f0f0f0' },
                     problemType === 'alagamento' && styles.activeProblemTypeButton
                   ]}
                   onPress={() => setProblemType('alagamento')}
@@ -438,11 +452,11 @@ export const MapScreen = () => {
                   <Ionicons 
                     name="water-outline" 
                     size={20} 
-                    color={problemType === 'alagamento' ? 'white' : '#333'} 
+                    color={problemType === 'alagamento' ? 'white' : (isDarkMode ? '#fff' : '#333')} 
                   />
                   <Text style={[
                     styles.problemTypeButtonText,
-                    problemType === 'alagamento' && styles.activeProblemTypeButtonText
+                    { color: problemType === 'alagamento' ? 'white' : (isDarkMode ? '#fff' : '#333') }
                   ]}>
                     Alagamento
                   </Text>
@@ -451,12 +465,17 @@ export const MapScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Descrição</Text>
+              <Text style={[styles.label, { color: colors.text }]}>Descrição</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { 
+                  backgroundColor: isDarkMode ? '#2a2a2a' : '#fff',
+                  color: colors.text,
+                  borderColor: isDarkMode ? '#444' : 'gray'
+                }]}
                 value={description}
                 onChangeText={setDescription}
                 placeholder="Descreva o problema"
+                placeholderTextColor={colors.textSecondary}
                 multiline
               />
             </View>
@@ -560,8 +579,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50',
   },
   controlButtonText: {
-    fontSize: 12,
-    marginTop: 4,
+    fontSize: 10,
+    marginTop: 2,
     color: '#333',
   },
   activeControlButtonText: {
@@ -577,8 +596,7 @@ const styles = StyleSheet.create({
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
+    padding: 20,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -587,7 +605,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    width: '80%',
+    width: '90%',
+    maxWidth: 400,
   },
   modalTitle: {
     fontSize: 18,
@@ -626,6 +645,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+    marginTop: 20,
   },
   button: {
     backgroundColor: '#3498db',
@@ -649,20 +669,24 @@ const styles = StyleSheet.create({
   },
   problemTypeButton: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 10,
-    marginHorizontal: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    marginHorizontal: 3,
     borderRadius: 8,
     backgroundColor: '#f0f0f0',
+    minHeight: 60,
   },
   activeProblemTypeButton: {
     backgroundColor: '#4CAF50',
   },
   problemTypeButtonText: {
-    marginLeft: 4,
+    marginTop: 4,
     color: '#333',
+    fontSize: 11,
+    textAlign: 'center',
   },
   activeProblemTypeButtonText: {
     color: 'white',
@@ -678,9 +702,10 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     flex: 1,
-    padding: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
     borderRadius: 8,
-    marginHorizontal: 8,
+    marginHorizontal: 5,
   },
   submitButton: {
     backgroundColor: '#4CAF50',

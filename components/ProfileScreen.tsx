@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, TextInput, Alert, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -56,82 +56,88 @@ export const ProfileScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Ionicons name="person-circle-outline" size={80} color="#4CAF50" />
-        <Text style={styles.title}>Meu Perfil</Text>
-      </View>
-
-      <View style={styles.form}>
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Nome</Text>
-          <TextInput
-            style={styles.input}
-            value={profile.name}
-            onChangeText={(value) => handleInputChange('name', value)}
-            placeholder="Seu nome"
-            editable={isEditing}
-          />
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Ionicons name="person-circle-outline" size={80} color="#4CAF50" />
+          <Text style={styles.title}>Meu Perfil</Text>
         </View>
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            value={profile.email}
-            onChangeText={(value) => handleInputChange('email', value)}
-            placeholder="seu@email.com"
-            keyboardType="email-address"
-            editable={isEditing}
-          />
-        </View>
+        <View style={styles.form}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Nome</Text>
+            <TextInput
+              style={styles.input}
+              value={profile.name}
+              onChangeText={(value) => handleInputChange('name', value)}
+              placeholder="Seu nome"
+              editable={isEditing}
+            />
+          </View>
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Telefone</Text>
-          <TextInput
-            style={styles.input}
-            value={profile.phone}
-            onChangeText={(value) => handleInputChange('phone', value)}
-            placeholder="(00) 00000-0000"
-            keyboardType="phone-pad"
-            editable={isEditing}
-          />
-        </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              value={profile.email}
+              onChangeText={(value) => handleInputChange('email', value)}
+              placeholder="seu@email.com"
+              keyboardType="email-address"
+              editable={isEditing}
+            />
+          </View>
 
-        <View style={styles.buttonContainer}>
-          {isEditing ? (
-            <>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Telefone</Text>
+            <TextInput
+              style={styles.input}
+              value={profile.phone}
+              onChangeText={(value) => handleInputChange('phone', value)}
+              placeholder="(00) 00000-0000"
+              keyboardType="phone-pad"
+              editable={isEditing}
+            />
+          </View>
+
+          <View style={styles.buttonContainer}>
+            {isEditing ? (
+              <>
+                <TouchableOpacity
+                  style={[styles.button, styles.cancelButton]}
+                  onPress={() => {
+                    setIsEditing(false);
+                    loadProfile();
+                  }}
+                >
+                  <Text style={styles.buttonText}>Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.saveButton]}
+                  onPress={saveProfile}
+                >
+                  <Text style={styles.buttonText}>Salvar</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
               <TouchableOpacity
-                style={[styles.button, styles.cancelButton]}
-                onPress={() => {
-                  setIsEditing(false);
-                  loadProfile();
-                }}
+                style={[styles.button, styles.editButton]}
+                onPress={() => setIsEditing(true)}
               >
-                <Text style={styles.buttonText}>Cancelar</Text>
+                <Text style={styles.buttonText}>Editar Perfil</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.button, styles.saveButton]}
-                onPress={saveProfile}
-              >
-                <Text style={styles.buttonText}>Salvar</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <TouchableOpacity
-              style={[styles.button, styles.editButton]}
-              onPress={() => setIsEditing(true)}
-            >
-              <Text style={styles.buttonText}>Editar Perfil</Text>
-            </TouchableOpacity>
-          )}
+            )}
+          </View>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',

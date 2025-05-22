@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { STORAGE_KEYS } from '../../components/MapScreen';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface MarkerData {
   id: string;
@@ -18,6 +19,7 @@ interface MarkerData {
 }
 
 export default function ReportsScreen() {
+  const { colors, isDarkMode } = useTheme();
   const [markers, setMarkers] = useState<MarkerData[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
   const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null);
@@ -100,7 +102,7 @@ export default function ReportsScreen() {
 
   const renderItem = ({ item }: { item: MarkerData }) => (
     <TouchableOpacity 
-      style={styles.reportItem}
+      style={[styles.reportItem, { backgroundColor: colors.surface }]}
       onPress={() => handleMarkerPress(item)}
     >
       <View style={styles.reportHeader}>
@@ -112,125 +114,162 @@ export default function ReportsScreen() {
           />
         </View>
         <View style={styles.reportInfo}>
-          <Text style={styles.reportType}>{getProblemTitle(item.problemType)}</Text>
-          <Text style={styles.reportDate}>{formatDate(item.date)}</Text>
+          <Text style={[styles.reportType, { color: colors.text }]}>{getProblemTitle(item.problemType)}</Text>
+          <Text style={[styles.reportDate, { color: colors.textSecondary }]}>{formatDate(item.date)}</Text>
         </View>
-        <Ionicons name="chevron-forward" size={24} color="#666" />
+        <Ionicons name="chevron-forward" size={24} color={colors.textSecondary} />
       </View>
-      <Text style={styles.reportDescription} numberOfLines={2}>
+      <Text style={[styles.reportDescription, { color: colors.text }]} numberOfLines={2}>
         {item.description}
       </Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar relatórios..."
-          value={searchText}
-          onChangeText={setSearchText}
-        />
-      </View>
-
-      <View style={styles.filterContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity
-            style={[styles.filterButton, selectedFilter === 'all' && styles.selectedFilter]}
-            onPress={() => setSelectedFilter('all')}
-          >
-            <Text style={[styles.filterText, selectedFilter === 'all' && styles.selectedFilterText]}>
-              Todos
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.filterButton, selectedFilter === 'buraco' && styles.selectedFilter]}
-            onPress={() => setSelectedFilter('buraco')}
-          >
-            <Text style={[styles.filterText, selectedFilter === 'buraco' && styles.selectedFilterText]}>
-              Buracos
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.filterButton, selectedFilter === 'acidente' && styles.selectedFilter]}
-            onPress={() => setSelectedFilter('acidente')}
-          >
-            <Text style={[styles.filterText, selectedFilter === 'acidente' && styles.selectedFilterText]}>
-              Acidentes
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.filterButton, selectedFilter === 'alagamento' && styles.selectedFilter]}
-            onPress={() => setSelectedFilter('alagamento')}
-          >
-            <Text style={[styles.filterText, selectedFilter === 'alagamento' && styles.selectedFilterText]}>
-              Alagamentos
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
-
-      <FlatList
-        data={filteredMarkers}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Ionicons name="document-text-outline" size={48} color="#666" />
-            <Text style={styles.emptyText}>Nenhum relatório encontrado</Text>
-          </View>
-        }
-      />
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            {selectedMarker && (
-              <>
-                <View style={styles.modalHeader}>
-                  <View style={[styles.modalIconContainer, { backgroundColor: getProblemColor(selectedMarker.problemType) + '20' }]}>
-                    <Ionicons 
-                      name={getProblemIcon(selectedMarker.problemType)} 
-                      size={32} 
-                      color={getProblemColor(selectedMarker.problemType)} 
-                    />
-                  </View>
-                  <Text style={styles.modalTitle}>{getProblemTitle(selectedMarker.problemType)}</Text>
-                  <Text style={styles.modalDate}>{formatDate(selectedMarker.date)}</Text>
-                </View>
-                <View style={styles.modalBody}>
-                  <Text style={styles.modalDescription}>{selectedMarker.description}</Text>
-                  <View style={styles.coordinatesContainer}>
-                    <Text style={styles.coordinatesLabel}>Localização:</Text>
-                    <Text style={styles.coordinatesText}>
-                      {selectedMarker.coordinate.latitude.toFixed(6)}, {selectedMarker.coordinate.longitude.toFixed(6)}
-                    </Text>
-                  </View>
-                </View>
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text style={styles.closeButtonText}>Fechar</Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.searchContainer, { backgroundColor: colors.surface }]}>
+          <Ionicons name="search" size={20} color={colors.textSecondary} style={styles.searchIcon} />
+          <TextInput
+            style={[styles.searchInput, { color: colors.text }]}
+            placeholder="Buscar relatórios..."
+            placeholderTextColor={colors.textSecondary}
+            value={searchText}
+            onChangeText={setSearchText}
+          />
         </View>
-      </Modal>
+
+        <View style={[styles.filterContainer, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <TouchableOpacity
+              style={[
+                styles.filterButton, 
+                { backgroundColor: isDarkMode ? '#2a2a2a' : '#f0f0f0' },
+                selectedFilter === 'all' && styles.selectedFilter
+              ]}
+              onPress={() => setSelectedFilter('all')}
+            >
+              <Text style={[
+                styles.filterText, 
+                { color: isDarkMode ? colors.text : '#666' },
+                selectedFilter === 'all' && styles.selectedFilterText
+              ]}>
+                Todos
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.filterButton,
+                { backgroundColor: isDarkMode ? '#2a2a2a' : '#f0f0f0' },
+                selectedFilter === 'buraco' && styles.selectedFilter
+              ]}
+              onPress={() => setSelectedFilter('buraco')}
+            >
+              <Text style={[
+                styles.filterText,
+                { color: isDarkMode ? colors.text : '#666' },
+                selectedFilter === 'buraco' && styles.selectedFilterText
+              ]}>
+                Buracos
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.filterButton,
+                { backgroundColor: isDarkMode ? '#2a2a2a' : '#f0f0f0' },
+                selectedFilter === 'acidente' && styles.selectedFilter
+              ]}
+              onPress={() => setSelectedFilter('acidente')}
+            >
+              <Text style={[
+                styles.filterText,
+                { color: isDarkMode ? colors.text : '#666' },
+                selectedFilter === 'acidente' && styles.selectedFilterText
+              ]}>
+                Acidentes
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.filterButton,
+                { backgroundColor: isDarkMode ? '#2a2a2a' : '#f0f0f0' },
+                selectedFilter === 'alagamento' && styles.selectedFilter
+              ]}
+              onPress={() => setSelectedFilter('alagamento')}
+            >
+              <Text style={[
+                styles.filterText,
+                { color: isDarkMode ? colors.text : '#666' },
+                selectedFilter === 'alagamento' && styles.selectedFilterText
+              ]}>
+                Alagamentos
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+
+        <FlatList
+          data={filteredMarkers}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Ionicons name="document-text-outline" size={48} color={colors.textSecondary} />
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Nenhum relatório encontrado</Text>
+            </View>
+          }
+        />
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              {selectedMarker && (
+                <>
+                  <View style={styles.modalHeader}>
+                    <View style={[styles.modalIconContainer, { backgroundColor: getProblemColor(selectedMarker.problemType) + '20' }]}>
+                      <Ionicons 
+                        name={getProblemIcon(selectedMarker.problemType)} 
+                        size={32} 
+                        color={getProblemColor(selectedMarker.problemType)} 
+                      />
+                    </View>
+                    <Text style={styles.modalTitle}>{getProblemTitle(selectedMarker.problemType)}</Text>
+                    <Text style={styles.modalDate}>{formatDate(selectedMarker.date)}</Text>
+                  </View>
+                  <View style={styles.modalBody}>
+                    <Text style={styles.modalDescription}>{selectedMarker.description}</Text>
+                    <View style={styles.coordinatesContainer}>
+                      <Text style={styles.coordinatesLabel}>Localização:</Text>
+                      <Text style={styles.coordinatesText}>
+                        {selectedMarker.coordinate.latitude.toFixed(6)}, {selectedMarker.coordinate.longitude.toFixed(6)}
+                      </Text>
+                    </View>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={() => setModalVisible(false)}
+                  >
+                    <Text style={styles.closeButtonText}>Fechar</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          </View>
+        </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
